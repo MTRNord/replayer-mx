@@ -51,6 +51,7 @@ fn main() -> Result<()> {
                 prev_content: None,
                 redacted_because: None,
             },
+            state_key: None,
         };
         {
             let mut data_file = File::create("data.cbor")?;

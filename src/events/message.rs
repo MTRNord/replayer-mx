@@ -19,7 +19,9 @@ pub(crate) struct Event<'a, Content> {
     #[b(5)]
     pub(crate) origin_server_ts: u64,
     #[b(6)]
-    pub(crate) unsigned: Unsigned<'a>,
+    pub(crate) unsigned: Unsigned<'a, Content>,
+    #[b(7)]
+    pub(crate) state_key: Option<Cow<'a, str>>,
 }
 
 #[derive(Encode, Decode)]
