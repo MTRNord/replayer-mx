@@ -62,6 +62,7 @@ pub(crate) struct AudioInfo<'a> {
 }
 
 #[derive(Encode, Decode, Debug)]
+#[cbor(index_only)]
 pub(crate) enum FormatType {
     #[b(0)]
     Html,
