@@ -8,7 +8,8 @@ use std::{
 
 use crate::events::{
     common::Unsigned,
-    message::{Content, Event, RoomMessageContent, TextContent},
+    message::{RoomMessageContent, TextContent},
+    Content, Event,
 };
 
 mod events;

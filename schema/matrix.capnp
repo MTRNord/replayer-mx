@@ -83,7 +83,7 @@ struct MessageEvent {
 
     struct LocationInfo {
         # Only present if image thumbnail is set
-        thumbnailInfo @0: ImageInfo;
+        thumbnailInfo @0: ThumbnailInfo;
         # Only present if image thumbnail is set
         thumbnailUrl @1: Text;
         # Only exists on E2EE encrypted messages
@@ -101,7 +101,7 @@ struct MessageEvent {
         # Only present if image thumbnail is set
         thumbnailFile @5: Text;
         # Only present if image thumbnail is set
-        thumbnailInfo @6: ImageInfo;
+        thumbnailInfo @6: ThumbnailInfo;
         # Only present if image thumbnail is set
         thumbnailUrl @7: Text;
     }
@@ -150,9 +150,16 @@ struct ImageInfo {
     # Only present if image thumbnail is set
     thumbnailFile @1: Text;
     # Only present if image thumbnail is set
-    thumbnailInfo @2: Text;
+    thumbnailInfo @2: ThumbnailInfo;
     # Only present if image thumbnail is set
     thumbnailUrl @3: Text;
+    size @4: UInt64;
+    h @5: UInt64;
+    w @6: UInt64;
+}
+
+struct ThumbnailInfo {
+    mimeType @0: Text;
     size @4: UInt64;
     h @5: UInt64;
     w @6: UInt64;
