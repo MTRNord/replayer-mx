@@ -1,4 +1,3 @@
-use crate::events_capnp::message_content;
 use crate::matrix_capnp::message_event;
 use crate::utils_capnp::option;
 use capnp::serialize_packed;
@@ -8,9 +7,6 @@ use std::{fs::File, io::BufReader};
 
 pub mod matrix_capnp {
     include!(concat!(env!("OUT_DIR"), "/matrix_capnp.rs"));
-}
-pub mod events_capnp {
-    include!(concat!(env!("OUT_DIR"), "/events_capnp.rs"));
 }
 pub mod utils_capnp {
     include!(concat!(env!("OUT_DIR"), "/utils_capnp.rs"));
@@ -74,8 +70,8 @@ fn main() -> Result<()> {
 
         println!("event_id: {}", event.get_event_id()?);
         println!("origin_server_ts: {}", event.get_origin_server_ts());
-        match event.get_content()?.which() {
-            Ok(message_content::Text(content)) => {
+        match event.get_content().which() {
+            Ok(message_event::content::Text(content)) => {
                 println!("text body: {}", content.get_body()?);
                 match content.get_formatted_body()?.which() {
                     Ok(option::Some(content)) => {
