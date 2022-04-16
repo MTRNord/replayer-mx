@@ -25,8 +25,8 @@ pub mod matrix {
                 let mut unsigned = event.reborrow().init_unsigned();
                 unsigned.set_age(405);
                 unsigned.set_transaction_id("m1650132888916.13");
-                let mut content = event.reborrow().init_content();
-                let mut text = content.reborrow().init_text();
+                let content = event.init_content();
+                let mut text = content.init_text();
                 text.set_body("This is a test");
             }
         }

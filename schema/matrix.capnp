@@ -81,17 +81,13 @@ struct MessageEvent {
         size @1: UInt64;
     }
 
-    struct ImageInfo {
-        mimeType @0: Text;
-        size @1: UInt64;
-        h @2: UInt64;
-        w @3: UInt64;
-    }
-
     struct LocationInfo {
+        # Only present if image thumbnail is set
         thumbnailInfo @0: ImageInfo;
+        # Only present if image thumbnail is set
         thumbnailUrl @1: Text;
         # Only exists on E2EE encrypted messages
+        # Only present if image thumbnail is set
         thumbnailFile @2: Text;
     }
 
@@ -101,14 +97,63 @@ struct MessageEvent {
         w @2: UInt64;
         size @3: UInt64;
         mimeType @4: Text;
-        thumbnailInfo @5: ImageInfo;
-        thumbnailUrl @6: Text;
+        # Only exists on E2EE encrypted messages
+        # Only present if image thumbnail is set
+        thumbnailFile @5: Text;
+        # Only present if image thumbnail is set
+        thumbnailInfo @6: ImageInfo;
+        # Only present if image thumbnail is set
+        thumbnailUrl @7: Text;
     }
+}
+
+struct RoomNameEvent {
+    name @0: Text;
+    roomId @1: Text;
+    sender @2: Text;
+    eventId @3: Text;
+    originServerTs @4: UInt64;
+    unsigned @5: Unsigned;
+}
+
+struct RoomTopicEvent {
+    topic @0: Text;
+    roomId @1: Text;
+    sender @2: Text;
+    eventId @3: Text;
+    originServerTs @4: UInt64;
+    unsigned @5: Unsigned;
+}
+
+struct RoomAvatarEvent {
+    avatarUrl @0: Text;
+    avatarInfo @1: ImageInfo;
+    roomId @2: Text;
+    sender @3: Text;
+    eventId @4: Text;
+    originServerTs @5: UInt64;
+    unsigned @6: Unsigned;
 }
 
 struct Unsigned(Content) {
     age @0: UInt64;
     transactionId @1: Text;
+    # Not present if first event of type
     prevContent @2: Content;
+    # Not present if not redacted
     redactedBecause @3: Text;
+}
+
+struct ImageInfo {
+    mimeType @0: Text;
+    # Only exists on E2EE encrypted messages
+    # Only present if image thumbnail is set
+    thumbnailFile @1: Text;
+    # Only present if image thumbnail is set
+    thumbnailInfo @2: Text;
+    # Only present if image thumbnail is set
+    thumbnailUrl @3: Text;
+    size @4: UInt64;
+    h @5: UInt64;
+    w @6: UInt64;
 }
