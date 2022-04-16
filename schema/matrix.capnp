@@ -1,23 +1,24 @@
 @0xeab570afa44bcb9d;
 
-using Util = import "/utils.capnp";
-
 struct MessageEvent {
     content: union {
         text: group {
             body @0: Text;
-            format @1: Util.Option(Text);
-            formattedBody @2: Util.Option(Text);
+            # Format is optional
+            format @1: Text;
+            formattedBody @2: Text;
         }
         emote: group {
             body @3: Text;
-            format @4: Util.Option(Text);
-            formattedBody @5: Util.Option(Text);
+            # Format is optional
+            format @4: Text;
+            formattedBody @5: Text;
         }
         notice: group {
             body @6: Text;
-            format @7: Util.Option(Text);
-            formattedBody @8: Util.Option(Text);
+            # Format is optional
+            format @7: Text;
+            formattedBody @8: Text;
         }
         audio: group {
             body @9: Text;
@@ -33,13 +34,15 @@ struct MessageEvent {
         image: group {
             body @16: Text;
             info @17: ImageInfo;
-            file @18: Util.Option(Text);
-            url @19: Text;
+            url @18: Text;
+            # File only exists if e2ee encrypted
+            file @19: Text;
         }
         location: group {
             body @20: Text;
             geoUri @21: Text;
-            info @22: Util.Option(LocationInfo);
+            # Info can be null
+            info @22: LocationInfo;
         }
         video: group {
             body @23: Text;
@@ -54,11 +57,10 @@ struct MessageEvent {
         }
     }
     roomId @30: Text;
-    stateKey @31: Util.Option(Text);
-    sender @32: Text;
-    eventId @33: Text;
-    originServerTs @34: UInt64;
-    unsigned @35: Unsigned;
+    sender @31: Text;
+    eventId @32: Text;
+    originServerTs @33: UInt64;
+    unsigned @34: Unsigned;
 
     enum ServerNoticeType {
         usageLimitExceeded @0;
@@ -89,7 +91,8 @@ struct MessageEvent {
     struct LocationInfo {
         thumbnailInfo @0: ImageInfo;
         thumbnailUrl @1: Text;
-        thumbnailFile @2: Util.Option(Text);
+        # Only exists on E2EE encrypted messages
+        thumbnailFile @2: Text;
     }
 
     struct VideoInfo {
@@ -106,6 +109,6 @@ struct MessageEvent {
 struct Unsigned(Content) {
     age @0: UInt64;
     transactionId @1: Text;
-    prevContent @2: Util.Option(Content);
-    redactedBecause @3: Util.Option(Text);
+    prevContent @2: Content;
+    redactedBecause @3: Text;
 }

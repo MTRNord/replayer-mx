@@ -1,5 +1,4 @@
 use crate::matrix_capnp::message_event;
-use crate::utils_capnp::option;
 use capnp::serialize_packed;
 use clap::Parser;
 use color_eyre::eyre::{eyre, Result};
@@ -7,9 +6,6 @@ use std::{fs::File, io::BufReader};
 
 pub mod matrix_capnp {
     include!(concat!(env!("OUT_DIR"), "/matrix_capnp.rs"));
-}
-pub mod utils_capnp {
-    include!(concat!(env!("OUT_DIR"), "/utils_capnp.rs"));
 }
 
 pub mod matrix {
@@ -32,8 +28,6 @@ pub mod matrix {
                 let mut content = event.reborrow().init_content();
                 let mut text = content.reborrow().init_text();
                 text.set_body("This is a test");
-                let mut formatted_body = text.init_formatted_body();
-                formatted_body.set_none(());
             }
         }
 
@@ -73,12 +67,8 @@ fn main() -> Result<()> {
         match event.get_content().which() {
             Ok(message_event::content::Text(content)) => {
                 println!("text body: {}", content.get_body()?);
-                match content.get_formatted_body()?.which() {
-                    Ok(option::Some(content)) => {
-                        println!("text formatted_body: {}", content?)
-                    }
-                    Ok(option::None(())) => println!("emote formatted_body: None"),
-                    Err(err) => println!("emote formatted_body: {:?}", err),
+                if content.has_formatted_body() {
+                    println!("text formatted_body: {}", content.get_formatted_body()?)
                 }
             }
             Err(err) => println!("content: {:?}", err),
