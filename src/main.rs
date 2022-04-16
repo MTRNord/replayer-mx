@@ -1,39 +1,17 @@
-use crate::matrix_capnp::message_event;
-use capnp::serialize_packed;
 use clap::Parser;
 use color_eyre::eyre::{eyre, Result};
-use std::{fs::File, io::BufReader};
+use minicbor::display;
+use std::{
+    fs::File,
+    io::{BufReader, Read},
+};
 
-pub mod matrix_capnp {
-    include!(concat!(env!("OUT_DIR"), "/matrix_capnp.rs"));
-}
+use crate::events::{
+    common::Unsigned,
+    message::{Event, EventType, MessageType, TextContent},
+};
 
-pub mod matrix {
-    use crate::matrix_capnp::message_event;
-    use capnp::message::{Builder, HeapAllocator};
-
-    pub fn build_event() -> Builder<HeapAllocator> {
-        let mut message = Builder::new_default();
-        {
-            let mut event = message.init_root::<message_event::Builder>();
-
-            {
-                event.set_event_id("$ip5l5n9ckymoybrwh-jl8BDYl8HCv2nO1d4NCFp4ek0");
-                event.set_origin_server_ts(1650133746117);
-                event.set_sender("@mtrnord:nordgedanken.dev");
-                event.set_room_id("!KwXDovBFhYakswlOwN:nordgedanken.dev");
-                let mut unsigned = event.reborrow().init_unsigned();
-                unsigned.set_age(405);
-                unsigned.set_transaction_id("m1650132888916.13");
-                let content = event.init_content();
-                let mut text = content.init_text();
-                text.set_body("This is a test");
-            }
-        }
-
-        message
-    }
-}
+mod events;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -53,34 +31,41 @@ fn main() -> Result<()> {
     }
 
     if args.read {
-        let mut data_file = File::open("./data")?;
-        let mut buf_reader = BufReader::new(&mut data_file);
-        let message_reader = serialize_packed::read_message(
-            &mut buf_reader,
-            ::capnp::message::ReaderOptions::new(),
-        )?;
-
-        let event = message_reader.get_root::<message_event::Reader>()?;
-
-        println!("event_id: {}", event.get_event_id()?);
-        println!("origin_server_ts: {}", event.get_origin_server_ts());
-        match event.get_content().which() {
-            Ok(message_event::content::Text(content)) => {
-                println!("text body: {}", content.get_body()?);
-                if content.has_formatted_body() {
-                    println!("text formatted_body: {}", content.get_formatted_body()?)
-                }
-            }
-            Err(err) => println!("content: {:?}", err),
-            _ => println!("content type not yet supported"),
-        }
+        todo!();
     } else if args.write {
-        let event = matrix::build_event();
-        let mut data_file = File::create("./data")?;
+        let data: Event<TextContent> = Event {
+            event_type: EventType::RoomMessage,
+            content: TextContent {
+                msg_type: MessageType::Text,
+                body: "This is a test".into(),
+                format: None,
+                formatted_body: None,
+            },
+            room_id: "!KwXDovBFhYakswlOwN:nordgedanken.dev".into(),
+            event_id: "$ip5l5n9ckymoybrwh-jl8BDYl8HCv2nO1d4NCFp4ek0".into(),
+            sender: "@nordgedanken:nordgedanken.dev".into(),
+            origin_server_ts: 1650133746117,
+            unsigned: Unsigned {
+                age: 405,
+                transaction_id: "m1650132888916.13".into(),
+                prev_content: None,
+                redacted_because: None,
+            },
+        };
+        {
+            let mut data_file = File::create("data.cbor")?;
+            minicbor::encode(&data, &mut data_file)?;
+        }
+        {
+            let file = File::open("data.cbor")?;
+            let mut reader = BufReader::new(file);
+            let mut buffer = Vec::new();
 
-        serialize_packed::write_message(&mut data_file, &event)?;
+            // Read file into vector.
+            reader.read_to_end(&mut buffer)?;
 
-        println!("Wrote event to ./data");
+            println!("{}", display(&buffer));
+        }
     }
 
     Ok(())

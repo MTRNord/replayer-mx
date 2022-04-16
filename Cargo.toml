@@ -6,9 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-capnp = "0.14"
+minicbor = { version = "0.15", features = ["derive", "partial-skip-support", "partial-derive-support", "std", "alloc", "half"] }
 color-eyre = "0.6"
 clap = { version = "3", features = ["derive"] }
-
-[build-dependencies]
-capnpc = "0.14"
