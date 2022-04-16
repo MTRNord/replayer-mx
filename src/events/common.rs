@@ -1,7 +1,7 @@
 use minicbor::{Decode, Encode};
 use std::borrow::Cow;
 
-#[derive(Encode, Decode)]
+#[derive(Encode, Decode, Debug)]
 pub(crate) struct Unsigned<'a, Content> {
     #[b(0)]
     pub(crate) age: u64,

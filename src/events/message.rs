@@ -4,52 +4,71 @@ use minicbor::{Decode, Encode};
 
 use crate::events::common::Unsigned;
 
-#[derive(Encode, Decode)]
-pub(crate) struct Event<'a, Content> {
+#[derive(Encode, Decode, Debug)]
+pub(crate) struct Event<'a> {
     #[b(0)]
-    pub(crate) event_type: EventType,
+    pub(crate) content: Content<'a>,
     #[b(1)]
-    pub(crate) content: Content,
-    #[b(2)]
     pub(crate) room_id: Cow<'a, str>,
-    #[b(3)]
+    #[b(2)]
     pub(crate) event_id: Cow<'a, str>,
-    #[b(4)]
+    #[b(3)]
     pub(crate) sender: Cow<'a, str>,
-    #[b(5)]
+    #[b(4)]
     pub(crate) origin_server_ts: u64,
+    #[b(5)]
+    pub(crate) unsigned: Unsigned<'a, Content<'a>>,
     #[b(6)]
-    pub(crate) unsigned: Unsigned<'a, Content>,
-    #[b(7)]
     pub(crate) state_key: Option<Cow<'a, str>>,
 }
 
-#[derive(Encode, Decode)]
+#[derive(Encode, Decode, Debug)]
+pub(crate) enum RoomMessageContent<'a> {
+    #[b(0)]
+    Text(#[b(0)] TextContent<'a>),
+    #[b(1)]
+    Audio(#[b(0)] AudioContent<'a>),
+}
+
+/// Use for text, emotes and notices
+#[derive(Encode, Decode, Debug)]
 pub(crate) struct TextContent<'a> {
     #[b(0)]
-    pub(crate) msg_type: MessageType,
-    #[b(1)]
     pub(crate) body: Cow<'a, str>,
-    #[b(2)]
+    #[b(1)]
     pub(crate) format: Option<FormatType>,
-    #[b(3)]
+    #[b(2)]
     pub(crate) formatted_body: Option<Cow<'a, str>>,
 }
 
-#[derive(Encode, Decode)]
+#[derive(Encode, Decode, Debug)]
+pub(crate) struct AudioContent<'a> {
+    #[b(0)]
+    pub(crate) body: Cow<'a, str>,
+    #[b(1)]
+    pub(crate) url: Cow<'a, str>,
+    #[b(2)]
+    pub(crate) info: Option<AudioInfo<'a>>,
+}
+
+#[derive(Encode, Decode, Debug)]
+pub(crate) struct AudioInfo<'a> {
+    #[b(0)]
+    pub(crate) duration: u64,
+    #[b(1)]
+    pub(crate) mime_type: Cow<'a, str>,
+    #[b(2)]
+    pub(crate) size: u64,
+}
+
+#[derive(Encode, Decode, Debug)]
 pub(crate) enum FormatType {
-    #[n(0)]
+    #[b(0)]
     Html,
 }
 
-#[derive(Encode, Decode)]
-pub(crate) enum MessageType {
-    #[n(0)]
-    Text,
-}
-
-#[derive(Encode, Decode)]
-pub(crate) enum EventType {
-    #[n(0)]
-    RoomMessage,
+#[derive(Encode, Decode, Debug)]
+pub(crate) enum Content<'a> {
+    #[b(0)]
+    RoomMessage(#[b(0)] RoomMessageContent<'a>),
 }

@@ -8,7 +8,7 @@ use std::{
 
 use crate::events::{
     common::Unsigned,
-    message::{Event, EventType, MessageType, TextContent},
+    message::{Content, Event, RoomMessageContent, TextContent},
 };
 
 mod events;
@@ -31,16 +31,21 @@ fn main() -> Result<()> {
     }
 
     if args.read {
-        todo!();
+        let file = File::open("data.cbor")?;
+        let mut reader = BufReader::new(file);
+        let mut buffer = Vec::new();
+
+        // Read file into vector.
+        reader.read_to_end(&mut buffer)?;
+        let output: Event = minicbor::decode(&buffer)?;
+        println!("{:#?}", output);
     } else if args.write {
-        let data: Event<TextContent> = Event {
-            event_type: EventType::RoomMessage,
-            content: TextContent {
-                msg_type: MessageType::Text,
+        let data: Event = Event {
+            content: Content::RoomMessage(RoomMessageContent::Text(TextContent {
                 body: "This is a test".into(),
                 format: None,
                 formatted_body: None,
-            },
+            })),
             room_id: "!KwXDovBFhYakswlOwN:nordgedanken.dev".into(),
             event_id: "$ip5l5n9ckymoybrwh-jl8BDYl8HCv2nO1d4NCFp4ek0".into(),
             sender: "@nordgedanken:nordgedanken.dev".into(),
